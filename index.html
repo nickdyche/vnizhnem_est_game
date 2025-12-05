@@ -9,8 +9,8 @@
 </head>
 <body>
     <div class="container">
-        <!-- ССЫЛКА НА КАНАЛ -->
-        <a href="https://t.me/vnizhnem_est" target="_blank" class="channel-link">
+        <!-- ССЫЛКА НА ТЕЛЕГРАМ -->
+        <a href="https://t.me/vnizhnem_est" target="_blank" class="telegram-link">
             📢 <strong>вНижнемЕсть</strong> в Telegram
         </a>
         
@@ -20,49 +20,37 @@
             <!-- СТАРТОВЫЙ ЭКРАН -->
             <div id="startScreen">
                 <h1>🐐 Коза в Нижнем</h1>
-                <p class="subtitle">Лети над Волгой, избегай лавочек!</p>
+                <p class="subtitle">Лети над Волгой, собирай бонусы, избегай опасность!</p>
                 
-                <div class="controls">
-                    <div class="control">
-                        <span class="icon">👆</span>
-                        <span class="text">Один тап = полет</span>
-                    </div>
-                    <div class="control">
-                        <span class="icon">👆👆</span>
-                        <span class="text">Два тапа = рывок вверх</span>
-                    </div>
-                    <div class="control">
-                        <span class="icon">🥟</span>
-                        <span class="text">Золотой пельмень = +10</span>
-                    </div>
-                    <div class="control">
-                        <span class="icon">💀</span>
-                        <span class="text">Красный пельмень = -20</span>
-                    </div>
+                <div class="simple-instructions">
+                    <p>Тапни или нажми ПРОБЕЛ чтобы лететь</p>
                 </div>
                 
-                <button id="startBtn">НАЧАТЬ ПОЛЕТ</button>
+                <button id="startBtn">СТАРТ</button>
                 
-                <p class="hint">Держись подальше от красных пельменей у потолка!</p>
+                <div class="high-score">
+                    <p>🏆 Рекорд: <span id="currentHighScore">0</span></p>
+                </div>
             </div>
             
             <!-- ЭКРАН ПРОИГРЫША -->
             <div id="gameOverScreen" style="display: none;">
-                <h2>💥 Упал в Волгу!</h2>
-                <div class="scores">
-                    <div class="score-item">
-                        <span class="label">Очки:</span>
-                        <span class="value" id="finalScore">0</span>
+                <h2>💥 Упал!</h2>
+                
+                <div class="final-scores">
+                    <div class="score-row">
+                        <span>Твой счет:</span>
+                        <span class="score-value" id="finalScore">0</span>
                     </div>
-                    <div class="score-item">
-                        <span class="label">🏆 Рекорд:</span>
-                        <span class="value" id="highScore">0</span>
+                    <div class="score-row">
+                        <span>Рекорд:</span>
+                        <span class="score-value" id="highScore">0</span>
                     </div>
                 </div>
                 
-                <button id="restartBtn">ЛЕТЕТЬ СНОВА</button>
+                <button id="restartBtn">ИГРАТЬ СНОВА</button>
                 
-                <p class="hint">Используй двойной тап для маневров!</p>
+                <p class="game-tip">Лети выше птиц, ниже лавочек! Или наоборот. </p>
             </div>
             
             <!-- ХОЛСТ -->
@@ -71,8 +59,12 @@
         
         <!-- ФУТЕР -->
         <div class="footer">
-            <p>Игра создана для проекта <strong>"вНижнемЕсть"</strong></p>
-            <p>Больше интересного о Нижнем Новгороде в нашем канале!</p>
+            <p>Игра создана для проекта 
+                <a href="https://t.me/vnizhnem_est" target="_blank" class="footer-link">
+                    <strong>вНижнемЕсть</strong>
+                </a>
+            </p>
+            <p>Больше интересного о Нижнем Новгороде!</p>
         </div>
     </div>
 
