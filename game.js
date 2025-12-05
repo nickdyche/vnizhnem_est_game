@@ -1,5 +1,5 @@
 // ====================
-// КОЗА В НИЖНЕМ - БОЛЬШЕ ПТИЦ!
+// КОЗА В НИЖНЕМ - С ЛЕВЕЛАМИ!
 // ====================
 
 // Telegram Web App Detection
@@ -133,6 +133,10 @@ ENEMY_BIRD_IMG.src = 'data:image/svg+xml;base64,' + btoa(`
 </svg>
 `);
 
+// ====================
+// НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ УРОВНЕЙ
+// ====================
+
 // Игровые переменные
 let score = 0;
 let highScore = parseInt(localStorage.getItem('goatHighScore')) || 0;
@@ -140,31 +144,35 @@ let gameOver = false;
 let gameStarted = false;
 let frames = 0;
 
+// Система уровней
+let currentLevel = 1;
+let speedMultiplier = 1.0;
+let levelUpEffect = 0; // Для анимации перехода уровня
+let nextLevelAt = 200; // Первый уровень на 200 очках
+
 // Коза
 const goat = {
     x: 150,
     y: 300,
-    width: isTelegram ? 45 : 50, // Чуть меньше для Telegram
+    width: isTelegram ? 45 : 50,
     height: isTelegram ? 45 : 50,
     velocity: 0,
-    gravity: isTelegram ? 0.45 : 0.5, // Легче для мобильных
-    jumpStrength: isTelegram ? -9 : -8, // Сильнее прыжок для тапов
+    gravity: isTelegram ? 0.45 : 0.5,
+    jumpStrength: isTelegram ? -9 : -8,
     rotation: 0
 };
 
-// Лавочки
-const benches = [];
+// Лавочки - БАЗОВЫЕ значения
 const BENCH = {
     width: 100,
     height: 60,
     gap: 200,
-    speed: isTelegram ? 2.8 : 3, // Медленнее для мобильных
+    baseSpeed: isTelegram ? 2.8 : 3,
     minY: 300,
     maxY: 450
 };
 
 // Пельмени
-const pelmeni = [];
 const PELMEN = {
     width: 35,
     height: 20,
@@ -172,23 +180,66 @@ const PELMEN = {
     spawnChance: 0.6
 };
 
-// Птицы враги - меньше на мобильных
-const enemyBirds = [];
+// Птицы враги - БАЗОВЫЕ значения
 const ENEMY_BIRD = {
     width: 60,
     height: 40,
     points: -20,
-    spawnChance: isTelegram ? 0.35 : 0.45, // Меньше птиц на мобильных
-    speed: isTelegram ? 2.5 : 3
+    baseSpawnChance: isTelegram ? 0.35 : 0.45,
+    baseSpeed: isTelegram ? 2.5 : 3
 };
 
-// Земля
+// Земля - БАЗОВЫЕ значения
 const ground = {
     x: 0,
     y: 540,
     height: 60,
-    speed: isTelegram ? 2.8 : 3
+    baseSpeed: isTelegram ? 2.8 : 3
 };
+
+// Массивы объектов
+const benches = [];
+const pelmeni = [];
+const enemyBirds = [];
+
+// ====================
+// ФУНКЦИИ УРОВНЕЙ
+// ====================
+
+function getCurrentSpeed() {
+    return ground.baseSpeed * speedMultiplier;
+}
+
+function getBirdSpawnChance() {
+    // Увеличиваем шанс появления птиц с уровнем
+    return ENEMY_BIRD.baseSpawnChance + (currentLevel - 1) * 0.05;
+}
+
+function getBirdSpeed() {
+    // Увеличиваем скорость птиц с уровнем
+    return ENEMY_BIRD.baseSpeed * (1 + (currentLevel - 1) * 0.1);
+}
+
+function updateLevel() {
+    // Проверяем, достигли ли нового уровня
+    if (score >= nextLevelAt) {
+        currentLevel++;
+        speedMultiplier = 1.0 + (currentLevel - 1) * 0.15; // +15% скорости за уровень
+        
+        // Устанавливаем следующий порог (каждый следующий уровень требует +50 очков)
+        nextLevelAt = 200 + (currentLevel - 1) * 150;
+        
+        // Запускаем эффект перехода уровня
+        levelUpEffect = 60; // 60 кадров анимации (2 секунды при 30fps)
+        
+        // Вибрация при переходе уровня в Telegram
+        if (isTelegram && navigator.vibrate) {
+            navigator.vibrate([100, 50, 100, 50, 100]);
+        }
+        
+        console.log(`🎮 Уровень ${currentLevel}! Скорость: x${speedMultiplier.toFixed(2)}`);
+    }
+}
 
 // ====================
 // TELEGRAM FUNCTIONS
@@ -217,6 +268,7 @@ function saveScoreToTelegram(userScore) {
                     userId: userId,
                     username: telegramUser.username || telegramUser.first_name || 'Игрок',
                     score: userScore,
+                    level: currentLevel,
                     timestamp: new Date().toISOString()
                 }));
             }
@@ -237,7 +289,7 @@ function saveScoreToTelegram(userScore) {
 function shareGameTelegram() {
     if (!isTelegram || !tg) return;
     
-    const shareText = `🎮 Я набрал ${score} очков в игре "Коза в Нижнем"! Сможешь побить мой рекорд?`;
+    const shareText = `🎮 Я достиг ${currentLevel} уровня и набрал ${score} очков в игре "Коза в Нижнем"! Сможешь побить?`;
     
     try {
         if (tg.shareGame) {
@@ -387,6 +439,11 @@ function startGame() {
     gameStarted = true;
     gameOver = false;
     score = 0;
+    currentLevel = 1;
+    speedMultiplier = 1.0;
+    levelUpEffect = 0;
+    nextLevelAt = 200;
+    
     benches.length = 0;
     pelmeni.length = 0;
     enemyBirds.length = 0;
@@ -422,6 +479,11 @@ function resetGame() {
     gameOver = false;
     gameStarted = false;
     score = 0;
+    currentLevel = 1;
+    speedMultiplier = 1.0;
+    levelUpEffect = 0;
+    nextLevelAt = 200;
+    
     benches.length = 0;
     pelmeni.length = 0;
     enemyBirds.length = 0;
@@ -481,7 +543,7 @@ function addEnemyBird() {
         hit: false,
         float: Math.random() * Math.PI * 2,
         type: 'bad',
-        speed: ENEMY_BIRD.speed + Math.random() * 1,
+        speed: getBirdSpeed() + Math.random() * 0.5,
         wave: Math.random() * Math.PI * 2
     });
 }
@@ -490,6 +552,14 @@ function update() {
     if (!gameStarted || gameOver) return;
     
     frames++;
+    
+    // Обновляем уровень
+    updateLevel();
+    
+    // Уменьшаем эффект перехода уровня
+    if (levelUpEffect > 0) {
+        levelUpEffect--;
+    }
     
     // Физика козы
     goat.velocity += goat.gravity;
@@ -505,14 +575,15 @@ function update() {
         goat.velocity = 0;
     }
     
-    // Земля
-    ground.x -= ground.speed;
+    // Земля с учетом множителя скорости
+    const currentSpeed = getCurrentSpeed();
+    ground.x -= currentSpeed;
     if (ground.x <= -canvas.width) ground.x = 0;
     
     // Лавочки
     for (let i = benches.length - 1; i >= 0; i--) {
         const bench = benches[i];
-        bench.x -= BENCH.speed;
+        bench.x -= currentSpeed;
         
         if (!bench.passed && bench.x + bench.width < goat.x) {
             bench.passed = true;
@@ -539,7 +610,7 @@ function update() {
     // Пельмени
     for (let i = pelmeni.length - 1; i >= 0; i--) {
         const pelmen = pelmeni[i];
-        pelmen.x -= BENCH.speed;
+        pelmen.x -= currentSpeed;
         pelmen.float += 0.05;
         
         if (!pelmen.collected &&
@@ -610,15 +681,17 @@ function update() {
         endGame();
     }
     
-    // Добавление объектов
-    if (frames % 120 === 0) {
+    // Добавление объектов с учетом уровня
+    const spawnInterval = Math.max(80, 120 - (currentLevel - 1) * 10); // Чаще на высоких уровнях
+    
+    if (frames % spawnInterval === 0) {
         addBench();
         if (Math.random() < PELMEN.spawnChance) addPelmen();
-        if (Math.random() < ENEMY_BIRD.spawnChance) addEnemyBird();
+        if (Math.random() < getBirdSpawnChance()) addEnemyBird();
     }
     
-    // Дополнительный шанс появления птиц
-    if (frames % 80 === 0 && Math.random() < 0.25) {
+    // Дополнительный шанс появления птиц (чаще на высоких уровнях)
+    if (frames % Math.max(60, 80 - (currentLevel - 1) * 5) === 0 && Math.random() < 0.25) {
         addEnemyBird();
     }
 }
@@ -646,6 +719,17 @@ function endGame() {
     // Show game over screen
     document.getElementById('gameOverScreen').style.display = 'flex';
     
+    // Добавляем информацию об уровне в экран проигрыша
+    const levelInfo = document.createElement('div');
+    levelInfo.className = 'level-info';
+    levelInfo.innerHTML = `<p style="color:#FFD700; font-size:20px; margin-top:10px;">🏆 Достигнут уровень: ${currentLevel}</p>`;
+    
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const finalScores = document.querySelector('.final-scores');
+    if (finalScores && !gameOverScreen.querySelector('.level-info')) {
+        finalScores.after(levelInfo);
+    }
+    
     // Vibrate on game over
     if (isTelegram && navigator.vibrate) {
         navigator.vibrate([300, 100, 300]);
@@ -665,7 +749,13 @@ function draw() {
     // Очищаем канвас
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Фон
+    // Фон с эффектом уровня (мигание при переходе)
+    if (levelUpEffect > 0 && levelUpEffect % 10 < 5) {
+        // Мигающий фон при переходе уровня
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    
     ctx.drawImage(BG_IMG, 0, 0, canvas.width, canvas.height);
     
     // Пельмени
@@ -745,6 +835,54 @@ function draw() {
     }
     
     ctx.restore();
+    
+    // Отображение уровня и скорости
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(10, canvas.height - 40, 180, 35);
+    
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Уровень: ${currentLevel}`, 20, canvas.height - 25);
+    
+    ctx.fillStyle = '#00FF00';
+    ctx.fillText(`Скорость: x${speedMultiplier.toFixed(2)}`, 20, canvas.height - 10);
+    
+    // Эффект перехода уровня
+    if (levelUpEffect > 0) {
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, levelUpEffect / 30);
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 32px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`🚀 УРОВЕНЬ ${currentLevel}!`, canvas.width / 2, canvas.height / 2);
+        
+        ctx.font = 'bold 20px Arial';
+        ctx.fillText(`Скорость +15%`, canvas.width / 2, canvas.height / 2 + 40);
+        ctx.restore();
+    }
+    
+    // Прогресс до следующего уровня
+    if (score > 0 && score < nextLevelAt) {
+        const progressWidth = 200;
+        const progress = (score % 200) / 200;
+        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(canvas.width - progressWidth - 10, canvas.height - 30, progressWidth, 15);
+        
+        ctx.fillStyle = '#FF8C00';
+        ctx.fillRect(canvas.width - progressWidth - 10, canvas.height - 30, progressWidth * progress, 15);
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+            `След. уровень: ${nextLevelAt - score} очков`,
+            canvas.width - progressWidth/2 - 10,
+            canvas.height - 20
+        );
+    }
 }
 
 // Игровой цикл
@@ -782,11 +920,9 @@ window.addEventListener('load', function() {
         tg.MainButton.show();
     }
     
-    console.log('Game loaded successfully!');
+    console.log('Game loaded successfully with LEVEL SYSTEM!');
     console.log('Telegram mode:', isTelegram ? 'ON' : 'OFF');
-    if (isTelegram) {
-        console.log('Telegram user:', telegramUser);
-    }
+    console.log('Level system: +15% speed every 200 points');
 });
 
 // Export functions for Telegram
