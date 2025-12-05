@@ -17,6 +17,8 @@ body {
     align-items: center;
     padding: 15px;
     position: relative;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .container {
@@ -30,10 +32,10 @@ body {
 }
 
 /* ========================================== */
-/* ССЫЛКА НА ТЕЛЕГРАМ - ОТДЕЛЬНАЯ, ПОВЕРХ ВСЕГО */
+/* ССЫЛКА НА ТЕЛЕГРАМ */
 /* ========================================== */
 .telegram-fixed-link {
-    position: absolute;
+    position: fixed;
     top: 15px;
     right: 15px;
     z-index: 1000;
@@ -101,7 +103,6 @@ body {
     width: 100%;
     height: 100%;
     background: transparent;
-    transform-origin: center center;
 }
 
 /* СЧЕТ */
@@ -200,6 +201,8 @@ button {
     min-width: 350px;
     min-height: 90px;
     letter-spacing: 1px;
+    position: relative;
+    z-index: 10;
 }
 
 button:hover, button:active {
@@ -308,22 +311,23 @@ button:hover, button:active {
 }
 
 /* ========================================== */
-/* МОБИЛЬНАЯ ВЕРСИЯ - УВЕЛИЧЕННЫЙ МАСШТАБ! */
+/* МОБИЛЬНАЯ ВЕРСИЯ - ФИКСИРОВАННЫЕ РАЗМЕРЫ */
 /* ========================================== */
 @media (max-width: 768px) {
     body {
         padding: 10px;
         justify-content: flex-start;
         padding-top: 80px;
-        transform: scale(1); /* Базовый масштаб */
+        align-items: flex-start;
     }
     
     .container {
         gap: 15px;
         width: 100%;
-        transform: scale(1.15); /* УВЕЛИЧИВАЕМ ВСЕ НА 15%! */
+        max-width: 100%;
+        /* УБРАЛИ transform: scale() - ЭТО ГЛАВНАЯ ПРОБЛЕМА! */
+        margin-top: 0;
         transform-origin: top center;
-        margin-top: -20px;
     }
     
     /* ССЫЛКА НА ТЕЛЕГРАМ НА МОБИЛЬНЫХ */
@@ -334,7 +338,6 @@ button:hover, button:active {
         left: 10px;
         text-align: center;
         z-index: 1000;
-        transform: scale(0.9); /* Чуть уменьшаем ссылку */
     }
     
     .telegram-button {
@@ -349,25 +352,18 @@ button:hover, button:active {
         font-size: 20px;
     }
     
-    /* ИГРА - УВЕЛИЧИВАЕМ МАСШТАБ */
+    /* ИГРА - ФИКСИРОВАННЫЕ РАЗМЕРЫ */
     #game {
-        height: 60vh; /* Чуть меньше высоты */
+        height: 60vh;
         min-height: 420px;
         border-width: 6px;
         border-radius: 25px;
         width: 100%;
         margin-top: 0;
-        transform: scale(1.2); /* ДОПОЛНИТЕЛЬНОЕ УВЕЛИЧЕНИЕ ИГРЫ! */
-        transform-origin: center center;
+        /* УБРАЛИ transform: scale() */
     }
     
-    /* КАНВАС - УВЕЛИЧИВАЕМ ВНУТРИ ИГРЫ */
-    #canvas {
-        transform: scale(1.1); /* ЕЩЕ УВЕЛИЧЕНИЕ! */
-        transform-origin: center center;
-    }
-    
-    /* ЗАГОЛОВКИ ЕЩЕ КРУПНЕЕ */
+    /* ЗАГОЛОВКИ */
     h1 {
         font-size: 32px !important;
         margin-bottom: 20px !important;
@@ -383,103 +379,95 @@ button:hover, button:active {
         margin-bottom: 30px !important;
     }
     
-    /* СЧЕТ ОГРОМНЫЙ */
+    /* СЧЕТ */
     #score {
-        font-size: 46px !important;
-        top: 20px !important;
-        left: 20px !important;
-        padding: 10px 22px !important;
-        border-width: 4px !important;
-        transform: scale(1.1); /* УВЕЛИЧИВАЕМ СЧЕТ ТОЖЕ */
+        font-size: 40px !important;
+        top: 15px !important;
+        left: 15px !important;
+        padding: 8px 20px !important;
+        border-width: 3px !important;
     }
     
     /* ЭКРАНЫ */
     #startScreen, #gameOverScreen {
-        padding: 35px 25px !important;
-        justify-content: center !important;
+        padding: 25px 20px !important;
     }
     
     /* ИНСТРУКЦИИ */
     .simple-instructions {
-        padding: 22px !important;
-        margin: 30px 0 !important;
+        padding: 20px !important;
+        margin: 20px 0 !important;
         width: 95% !important;
     }
     
     .simple-instructions p {
-        font-size: 24px !important; /* КРУПНЕЕ! */
+        font-size: 20px !important;
     }
     
-    /* КНОПКИ ЕЩЕ БОЛЬШЕ */
+    /* КНОПКИ */
     button {
-        padding: 25px 45px !important;
-        font-size: 30px !important;
-        min-width: 320px !important;
-        min-height: 90px !important;
-        border-width: 5px !important;
-        margin: 30px 0 !important;
-        transform: scale(1.05); /* Чуть увеличиваем кнопки */
+        padding: 20px 35px !important;
+        font-size: 26px !important;
+        min-width: 280px !important;
+        min-height: 70px !important;
+        border-width: 4px !important;
+        margin: 20px 0 !important;
     }
     
     /* РЕКОРДЫ */
     .high-score {
-        padding: 22px 30px !important;
-        margin-top: 30px !important;
+        padding: 15px 25px !important;
+        margin-top: 20px !important;
     }
     
     .high-score p {
-        font-size: 26px !important; /* КРУПНЕЕ! */
+        font-size: 20px !important;
     }
     
     .high-score span {
-        font-size: 30px !important;
+        font-size: 24px !important;
     }
     
     /* ФИНАЛЬНЫЙ СЧЕТ */
     .final-scores {
-        padding: 30px !important;
-        margin: 35px 0 !important;
+        padding: 25px !important;
+        margin: 25px 0 !important;
         width: 95% !important;
     }
     
     .score-row {
-        margin: 20px 0 !important;
-        padding: 20px 25px !important;
-        font-size: 26px !important; /* КРУПНЕЕ! */
+        margin: 15px 0 !important;
+        padding: 15px 20px !important;
+        font-size: 20px !important;
     }
     
     .score-value {
-        font-size: 34px !important; /* КРУПНЕЕ! */
+        font-size: 28px !important;
     }
     
     /* СОВЕТ */
     .game-tip {
-        font-size: 22px !important;
-        margin-top: 30px !important;
-        padding: 15px 22px !important;
+        font-size: 18px !important;
+        margin-top: 20px !important;
+        padding: 12px 18px !important;
     }
     
     /* ФУТЕР */
     .footer {
-        padding: 20px !important;
-        margin-top: 25px !important;
-        transform: scale(0.95); /* Чуть уменьшаем футер */
+        padding: 15px !important;
+        margin-top: 20px !important;
     }
     
     .footer p {
-        font-size: 18px !important;
+        font-size: 16px !important;
     }
 }
 
-/* ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ (iPhone SE) */
+/* ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ */
 @media (max-width: 375px) {
-    .container {
-        transform: scale(1.1); /* Чуть меньше увеличение */
-    }
-    
-    .telegram-button {
-        font-size: 15px;
-        padding: 11px 18px;
+    #game {
+        height: 55vh;
+        min-height: 380px;
     }
     
     h1 {
@@ -491,24 +479,18 @@ button:hover, button:active {
     }
     
     .subtitle {
-        font-size: 20px !important;
+        font-size: 18px !important;
     }
     
     button {
-        padding: 22px 35px !important;
-        font-size: 26px !important;
-        min-width: 280px !important;
-        min-height: 85px !important;
+        padding: 18px 25px !important;
+        font-size: 22px !important;
+        min-width: 250px !important;
+        min-height: 60px !important;
     }
     
     #score {
-        font-size: 40px !important;
-    }
-    
-    #game {
-        height: 55vh;
-        min-height: 380px;
-        transform: scale(1.15);
+        font-size: 36px !important;
     }
 }
 
@@ -527,14 +509,10 @@ button:hover, button:active {
     }
     
     #game {
-        height: 80vh;
-        max-height: none;
-        margin-top: 50px;
-        transform: scale(1.1);
-    }
-    
-    .container {
-        transform: scale(1);
+        height: 85vh;
+        min-height: 300px;
+        max-height: 90vh;
+        margin-top: 40px;
     }
     
     h1 {
@@ -548,14 +526,14 @@ button:hover, button:active {
     }
     
     button {
-        padding: 18px 30px !important;
-        font-size: 22px !important;
-        min-height: 70px !important;
-        margin: 20px 0 !important;
+        padding: 15px 25px !important;
+        font-size: 20px !important;
+        min-height: 50px !important;
+        margin: 15px 0 !important;
     }
     
     #score {
-        font-size: 34px !important;
+        font-size: 30px !important;
     }
 }
 

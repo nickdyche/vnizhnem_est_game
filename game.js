@@ -5,18 +5,80 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-// Изображения
+// Размеры канваса для мобильных
+function resizeCanvas() {
+    const gameContainer = document.getElementById('game');
+    canvas.width = gameContainer.clientWidth;
+    canvas.height = gameContainer.clientHeight;
+    
+    // Обновляем позицию земли
+    ground.y = canvas.height - 50;
+}
+
+window.addEventListener('resize', resizeCanvas);
+
+// Изображения с запасными вариантами
 const BIRD_IMG = new Image();
 BIRD_IMG.src = 'bird.png';
+BIRD_IMG.onerror = function() {
+    // Запасное изображение козы
+    this.src = 'data:image/svg+xml;base64,' + btoa(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="#8B4513"/>
+            <circle cx="30" cy="40" r="10" fill="#8B4513"/>
+            <circle cx="70" cy="40" r="10" fill="#8B4513"/>
+            <ellipse cx="50" cy="70" rx="20" ry="15" fill="#8B4513"/>
+            <circle cx="40" cy="80" r="5" fill="#FFD700"/>
+            <circle cx="60" cy="80" r="5" fill="#FFD700"/>
+            <polygon points="40,25 45,15 50,25" fill="#FF0000"/>
+            <polygon points="50,25 55,15 60,25" fill="#FF0000"/>
+        </svg>
+    `);
+};
 
 const PIPE_IMG = new Image();
 PIPE_IMG.src = 'pipe.png';
+PIPE_IMG.onerror = function() {
+    // Запасное изображение лавочки
+    this.src = 'data:image/svg+xml;base64,' + btoa(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60">
+            <rect x="0" y="0" width="100" height="60" fill="#8B4513"/>
+            <rect x="10" y="10" width="80" height="10" fill="#A0522D"/>
+            <rect x="20" y="25" width="60" height="10" fill="#A0522D"/>
+        </svg>
+    `);
+};
 
 const BG_IMG = new Image();
 BG_IMG.src = 'background.png';
+BG_IMG.onerror = function() {
+    // Запасной фон
+    this.src = 'data:image/svg+xml;base64,' + btoa(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+            <defs>
+                <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#87CEEB"/>
+                    <stop offset="100%" style="stop-color:#1E90FF"/>
+                </linearGradient>
+            </defs>
+            <rect width="800" height="600" fill="url(#bg)"/>
+            <circle cx="100" cy="100" r="40" fill="#FFD700" opacity="0.8"/>
+            <circle cx="300" cy="150" r="30" fill="#FFD700" opacity="0.6"/>
+        </svg>
+    `);
+};
 
 const GROUND_IMG = new Image();
 GROUND_IMG.src = 'ground.png';
+GROUND_IMG.onerror = function() {
+    // Запасное изображение земли
+    this.src = 'data:image/svg+xml;base64,' + btoa(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 50">
+            <rect width="800" height="50" fill="#228B22"/>
+            <rect y="20" width="800" height="10" fill="#32CD32"/>
+        </svg>
+    `);
+};
 
 // Пельмени
 const PELMEN_IMG = new Image();
@@ -44,10 +106,13 @@ let gameOver = false;
 let gameStarted = false;
 let frames = 0;
 
+// Обновляем рекорд на стартовом экране
+document.getElementById('currentHighScore').textContent = highScore;
+
 // Коза
 const goat = {
     x: 150,
-    y: canvas.height / 2,
+    y: 300,
     width: 50,
     height: 50,
     velocity: 0,
@@ -76,26 +141,26 @@ const PELMEN = {
     spawnChance: 0.6
 };
 
-// Птицы враги - БОЛЬШЕ ПТИЦ! (увеличили spawnChance с 0.3 до 0.45)
+// Птицы враги
 const enemyBirds = [];
 const ENEMY_BIRD = {
     width: 60,
     height: 40,
     points: -20,
-    spawnChance: 0.45, // БЫЛО 0.3, СТАЛО 0.45 (+50%!)
+    spawnChance: 0.45,
     speed: 3
 };
 
 // Земля
 const ground = {
     x: 0,
-    y: canvas.height - 50,
+    y: 550,
     height: 50,
     speed: 3
 };
 
 // ====================
-// УПРАВЛЕНИЕ (с защитой от кликов по ссылкам)
+// УПРАВЛЕНИЕ
 // ====================
 function handleJump() {
     if (!gameStarted) {
@@ -107,13 +172,18 @@ function handleJump() {
     }
 }
 
-// Умный обработчик кликов - игнорирует клики по Telegram-ссылкам
+// Обработчик кликов
 function handleGameClick(e) {
     // Проверяем, не кликнули ли по Telegram-ссылке
     if (e.target.closest('.telegram-button') || 
         e.target.closest('.telegram-fixed-link') ||
         e.target.closest('.footer-link')) {
-        return; // Не обрабатываем игрой - пусть ссылка работает
+        return;
+    }
+    
+    // Проверяем, не кликнули ли по кнопке
+    if (e.target.id === 'startBtn' || e.target.id === 'restartBtn') {
+        return; // Кнопки обрабатываются отдельно
     }
     
     handleJump();
@@ -123,11 +193,14 @@ function handleGameClick(e) {
 document.addEventListener('click', handleGameClick);
 
 document.addEventListener('touchstart', function(e) {
-    // Проверяем, не тапнули ли по Telegram-ссылке
     if (e.target.closest('.telegram-button') || 
         e.target.closest('.telegram-fixed-link') ||
         e.target.closest('.footer-link')) {
-        return; // Не обрабатываем игрой
+        return;
+    }
+    
+    if (e.target.id === 'startBtn' || e.target.id === 'restartBtn') {
+        return;
     }
     
     e.preventDefault();
@@ -155,15 +228,27 @@ function startGame() {
     benches.length = 0;
     pelmeni.length = 0;
     enemyBirds.length = 0;
+    
+    // Сбрасываем позицию козы
     goat.y = canvas.height / 2;
     goat.velocity = 0;
+    goat.rotation = 0;
+    
     frames = 0;
     
+    // Показываем/скрываем экраны
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameOverScreen').style.display = 'none';
     document.getElementById('score').textContent = '0';
     
+    // Обновляем размер канваса
+    resizeCanvas();
+    
+    // Добавляем первую лавочку
     addBench();
+    
+    // Запускаем игровой цикл
+    gameLoop();
 }
 
 function resetGame() {
@@ -173,12 +258,20 @@ function resetGame() {
     benches.length = 0;
     pelmeni.length = 0;
     enemyBirds.length = 0;
+    
+    // Сбрасываем позицию козы
     goat.y = canvas.height / 2;
     goat.velocity = 0;
+    goat.rotation = 0;
     
+    // Обновляем размер канваса
+    resizeCanvas();
+    
+    // Показываем стартовый экран
     document.getElementById('gameOverScreen').style.display = 'none';
     document.getElementById('startScreen').style.display = 'flex';
     document.getElementById('score').textContent = '0';
+    document.getElementById('currentHighScore').textContent = highScore;
 }
 
 function addBench() {
@@ -194,7 +287,7 @@ function addBench() {
 function addPelmen() {
     pelmeni.push({
         x: canvas.width + Math.random() * 100,
-        y: Math.random() * 300 + 150,
+        y: Math.random() * (canvas.height - 300) + 150,
         width: PELMEN.width,
         height: PELMEN.height,
         collected: false,
@@ -206,14 +299,14 @@ function addPelmen() {
 function addEnemyBird() {
     enemyBirds.push({
         x: canvas.width + 50,
-        y: Math.random() * 300 + 100,
+        y: Math.random() * (canvas.height - 200) + 100,
         width: ENEMY_BIRD.width,
         height: ENEMY_BIRD.height,
         hit: false,
         float: Math.random() * Math.PI * 2,
         type: 'bad',
         speed: ENEMY_BIRD.speed + Math.random() * 1,
-        wave: Math.random() * Math.PI * 2 // Для волнового движения
+        wave: Math.random() * Math.PI * 2
     });
 }
 
@@ -292,14 +385,14 @@ function update() {
         }
     }
     
-    // Птицы - БОЛЬШЕ И СЛОЖНЕЕ!
+    // Птицы
     for (let i = enemyBirds.length - 1; i >= 0; i--) {
         const bird = enemyBirds[i];
         bird.x -= bird.speed;
         bird.float += 0.1;
         bird.wave += 0.05;
         
-        // Птицы летят волнами (синусоида)
+        // Птицы летят волнами
         bird.y += Math.sin(bird.wave) * 2;
         
         if (!bird.hit &&
@@ -331,15 +424,14 @@ function update() {
         endGame();
     }
     
-    // Добавление объектов - БОЛЬШЕ ПТИЦ!
+    // Добавление объектов
     if (frames % 120 === 0) {
         addBench();
         if (Math.random() < PELMEN.spawnChance) addPelmen();
-        // Увеличили шанс появления птиц!
         if (Math.random() < ENEMY_BIRD.spawnChance) addEnemyBird();
     }
     
-    // Дополнительный шанс появления птиц (для еще большего количества)
+    // Дополнительный шанс появления птиц
     if (frames % 80 === 0 && Math.random() < 0.25) {
         addEnemyBird();
     }
@@ -362,6 +454,9 @@ function endGame() {
 // ОТРИСОВКА
 // ====================
 function draw() {
+    // Очищаем канвас
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
     // Фон
     ctx.drawImage(BG_IMG, 0, 0, canvas.width, canvas.height);
     
@@ -375,7 +470,7 @@ function draw() {
         if (!pelmen.collected) {
             ctx.save();
             ctx.translate(pelmen.x + pelmen.width/2, pelmen.y + pelmen.height/2);
-            ctx.rotate(pelmen.float);
+            ctx.rotate(Math.sin(pelmen.float) * 0.2);
             ctx.drawImage(PELMEN_IMG, -pelmen.width/2, -pelmen.height/2, pelmen.width, pelmen.height);
             ctx.restore();
         } else if (pelmen.effect) {
@@ -385,7 +480,7 @@ function draw() {
                 ctx.save();
                 ctx.globalAlpha = 1 - age / 30;
                 ctx.fillStyle = '#FFD700';
-                ctx.font = 'bold 20px Arial';
+                ctx.font = 'bold 24px Arial';
                 ctx.textAlign = 'center';
                 ctx.fillText(pelmen.effect, pelmen.x + pelmen.width/2, pelmen.y - age);
                 ctx.restore();
@@ -404,5 +499,62 @@ function draw() {
             ctx.shadowBlur = 10;
         }
         
-        // Анимация полета (легкое масштабирование)
-        const scaleY = 0.9 + Math.abs(Math.sin(bird.float
+        // Анимация полета
+        const scaleY = 0.9 + Math.abs(Math.sin(bird.float)) * 0.2;
+        ctx.scale(1, scaleY);
+        
+        ctx.drawImage(ENEMY_BIRD_IMG, -bird.width/2, -bird.height/2, bird.width, bird.height);
+        ctx.restore();
+        
+        if (bird.effect) {
+            // Эффект столкновения
+            const age = frames - bird.effectTime;
+            if (age < 30) {
+                ctx.save();
+                ctx.globalAlpha = 1 - age / 30;
+                ctx.fillStyle = '#FF0000';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(bird.effect, bird.x + bird.width/2, bird.y - age);
+                ctx.restore();
+            }
+        }
+    });
+    
+    // Земля
+    for (let i = 0; i <= Math.ceil(canvas.width / canvas.width) + 1; i++) {
+        ctx.drawImage(GROUND_IMG, ground.x + i * canvas.width, ground.y, canvas.width, ground.height);
+    }
+    
+    // Коза
+    ctx.save();
+    ctx.translate(goat.x + goat.width/2, goat.y + goat.height/2);
+    ctx.rotate(goat.rotation);
+    ctx.drawImage(BIRD_IMG, -goat.width/2, -goat.height/2, goat.width, goat.height);
+    ctx.restore();
+}
+
+// Игровой цикл
+function gameLoop() {
+    update();
+    draw();
+    
+    if (gameStarted && !gameOver) {
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+// Инициализация при загрузке страницы
+window.addEventListener('load', function() {
+    // Устанавливаем рекорд
+    highScore = parseInt(localStorage.getItem('goatHighScore')) || 0;
+    document.getElementById('currentHighScore').textContent = highScore;
+    
+    // Настраиваем размер канваса
+    resizeCanvas();
+    
+    // Рисуем начальный экран
+    draw();
+    
+    console.log('Игра загружена. Нажмите СТАРТ или пробел, чтобы начать!');
+});

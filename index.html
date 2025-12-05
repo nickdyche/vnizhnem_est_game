@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- ОТДЕЛЬНАЯ ССЫЛКА НА ТЕЛЕГРАМ (кликабельная всегда!) -->
+        <!-- ОТДЕЛЬНАЯ ССЫЛКА НА ТЕЛЕГРАМ -->
         <div class="telegram-fixed-link">
             <a href="https://t.me/vnizhnem_est" target="_blank" class="telegram-button">
                 <span class="tg-icon">📢</span>
@@ -23,7 +23,7 @@
             <!-- СТАРТОВЫЙ ЭКРАН -->
             <div id="startScreen">
                 <h1>🐐 Коза в Нижнем</h1>
-                <p class="subtitle">Лети над Волгой, собирай пельмени, избегай птиц!</p>
+                <p class="subtitle">Лети над Волгой, собирай бонусы, избегай опасность!</p>
                 
                 <div class="simple-instructions">
                     <p>Тапни или нажми ПРОБЕЛ чтобы лететь</p>
@@ -71,6 +71,16 @@
         </div>
     </div>
 
+    <!-- Скрипт В НАЧАЛЕ body чтобы кнопки работали -->
+    <script>
+        // Сначала устанавливаем рекорд из localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const highScore = parseInt(localStorage.getItem('goatHighScore')) || 0;
+            document.getElementById('currentHighScore').textContent = highScore;
+        });
+    </script>
+    
+    <!-- Основной скрипт игры -->
     <script src="game.js"></script>
 </body>
 </html>
