@@ -1,5 +1,5 @@
 // ====================
-// КОЗА В НИЖНЕМ - БАЛАНСИРОВАННАЯ ВЕРСИЯ
+// КОЗА В НИЖНЕМ - КЛАССИЧЕСКАЯ ФИЗИКА
 // ====================
 
 const canvas = document.getElementById('canvas');
@@ -23,18 +23,14 @@ const PELMEN_IMG = new Image();
 PELMEN_IMG.src = 'data:image/svg+xml;base64,' + btoa(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60">
     <ellipse cx="50" cy="30" rx="45" ry="25" fill="#FFD700" stroke="#b8860b" stroke-width="3"/>
-    <ellipse cx="35" cy="20" rx="8" ry="4" fill="rgba(255,255,255,0.8)"/>
 </svg>
 `);
 
-// ОПАСНЫЕ пельмени (красные, у потолка)
+// Красные пельмени
 const BAD_PELMEN_IMG = new Image();
 BAD_PELMEN_IMG.src = 'data:image/svg+xml;base64,' + btoa(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60">
     <ellipse cx="50" cy="30" rx="45" ry="25" fill="#ff4444" stroke="#cc0000" stroke-width="3"/>
-    <ellipse cx="35" cy="20" rx="8" ry="4" fill="rgba(255,255,255,0.8)"/>
-    <path d="M25,40 L35,50 L45,40" stroke="#fff" stroke-width="3" fill="none"/>
-    <path d="M55,40 L65,50 L75,40" stroke="#fff" stroke-width="3" fill="none"/>
 </svg>
 `);
 
@@ -45,11 +41,7 @@ let gameOver = false;
 let gameStarted = false;
 let frames = 0;
 
-// Для двойного тапа
-let lastTapTime = 0;
-let tapCount = 0;
-
-// КОЗА
+// КОЗА (классическая физика)
 const goat = {
     x: 150,
     y: canvas.height / 2,
@@ -57,14 +49,12 @@ const goat = {
     height: 50,
     velocity: 0,
     gravity: 0.5,
-    jumpStrength: -9,
-    superJumpStrength: -15, // Сильнее при двойном тапе
+    jumpStrength: -8, // Легкий прыжок
     rotation: 0,
-    maxJumpHeight: 100, // Максимум (красные пельмени будут чуть выше)
-    isAtCeiling: false
+    maxHeight: 100 // Красные пельмени будут на 80-120
 };
 
-// ЛАВОЧКИ (снизу)
+// Лавочки
 const benches = [];
 const BENCH = {
     width: 100,
@@ -75,7 +65,7 @@ const BENCH = {
     maxY: 500
 };
 
-// ПЕЛЬМЕНИ
+// Пельмени
 const pelmeni = [];
 const PELMEN = {
     width: 35,
@@ -83,14 +73,10 @@ const PELMEN = {
     goodPoints: 10,
     badPoints: -20,
     goodSpawnChance: 0.7,
-    badSpawnChance: 0.4,
-    goodMinY: 200,   // Золотые - в средней зоне
-    goodMaxY: 400,
-    badMinY: 50,     // Красные - у самого потолка
-    badMaxY: 120
+    badSpawnChance: 0.4
 };
 
-// ЗЕМЛЯ
+// Земля
 const ground = {
     x: 0,
     y: canvas.height - 50,
@@ -99,82 +85,37 @@ const ground = {
 };
 
 // ====================
-// УПРАВЛЕНИЕ С ДВОЙНЫМ ТАПОМ
+// ПРОСТОЕ УПРАВЛЕНИЕ
 // ====================
-function handleTap(e) {
-    if (e.type === 'touchstart') e.preventDefault();
+function handleJump() {
+    if (!gameStarted) {
+        startGame();
+        return;
+    }
     
-    const currentTime = Date.now();
-    const timeDiff = currentTime - lastTapTime;
-    
-    tapCount++;
-    
-    if (tapCount === 1) {
-        lastTapTime = currentTime;
-        
-        setTimeout(() => {
-            if (tapCount === 1) {
-                // ОДИНАРНЫЙ ТАП
-                if (!gameStarted) {
-                    startGame();
-                } else if (!gameOver) {
-                    goat.velocity = goat.jumpStrength;
-                } else {
-                    resetGame();
-                }
-            }
-            tapCount = 0;
-        }, 300);
-        
-    } else if (tapCount === 2 && timeDiff < 300) {
-        // ДВОЙНОЙ ТАП (быстрый!)
-        tapCount = 0;
-        
-        if (gameStarted && !gameOver) {
-            goat.velocity = goat.superJumpStrength;
-            // Эффект двойного тапа
-            showDoubleTapEffect(goat.x, goat.y);
-        }
+    if (!gameOver) {
+        goat.velocity = goat.jumpStrength;
+    } else {
+        resetGame();
     }
 }
 
-// Эффект двойного тапа
-function showDoubleTapEffect(x, y) {
-    const effect = {
-        x: x,
-        y: y,
-        radius: 20,
-        alpha: 0.8,
-        life: 30
-    };
-    
-    function animateEffect() {
-        if (effect.life > 0) {
-            effect.radius += 2;
-            effect.alpha -= 0.05;
-            effect.life--;
-            setTimeout(animateEffect, 16);
-        }
-    }
-    animateEffect();
-    
-    // Сохраняем для отрисовки
-    if (!window.effects) window.effects = [];
-    window.effects.push(effect);
-}
-
-// Обработчики
-document.addEventListener('touchstart', handleTap, { passive: false });
-document.addEventListener('click', handleTap);
+// Тапы и клики
+document.addEventListener('click', handleJump);
+document.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    handleJump();
+}, { passive: false });
 
 // Клавиатура
 document.addEventListener('keydown', function(e) {
     if (e.code === 'Space') {
         e.preventDefault();
-        handleTap(e);
+        handleJump();
     }
 });
 
+// Кнопки
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('restartBtn').addEventListener('click', resetGame);
 
@@ -191,14 +132,14 @@ function startGame() {
     pelmeni.length = 0;
     goat.y = canvas.height / 2;
     goat.velocity = 0;
-    goat.isAtCeiling = false;
     
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameOverScreen').style.display = 'none';
     document.getElementById('score').textContent = '0';
     
+    // Первые объекты
     addBench();
-    addPelmeni();
+    if (Math.random() < 0.5) addPelmen();
 }
 
 function resetGame() {
@@ -209,7 +150,6 @@ function resetGame() {
     pelmeni.length = 0;
     goat.y = canvas.height / 2;
     goat.velocity = 0;
-    goat.isAtCeiling = false;
     
     document.getElementById('gameOverScreen').style.display = 'none';
     document.getElementById('startScreen').style.display = 'flex';
@@ -217,43 +157,38 @@ function resetGame() {
 }
 
 function addBench() {
-    const y = Math.random() * (BENCH.maxY - BENCH.minY) + BENCH.minY;
     benches.push({
         x: canvas.width,
-        y: y,
+        y: Math.random() * (BENCH.maxY - BENCH.minY) + BENCH.minY,
         width: BENCH.width,
         height: BENCH.height,
         passed: false
     });
 }
 
-function addPelmeni() {
-    // ЗОЛОТЫЕ пельмени (хорошие)
-    if (Math.random() < PELMEN.goodSpawnChance) {
-        pelmeni.push({
-            x: canvas.width + Math.random() * 150,
-            y: Math.random() * (PELMEN.goodMaxY - PELMEN.goodMinY) + PELMEN.goodMinY,
-            width: PELMEN.width,
-            height: PELMEN.height,
-            isGood: true,
-            collected: false,
-            float: Math.random() * Math.PI * 2,
-            speed: 0.5 + Math.random() * 0.5
-        });
-    }
+function addPelmen() {
+    // Золотой пельмень (середина)
+    pelmeni.push({
+        x: canvas.width + Math.random() * 100,
+        y: Math.random() * 300 + 150, // 150-450
+        width: PELMEN.width,
+        height: PELMEN.height,
+        isGood: true,
+        collected: false,
+        float: Math.random() * Math.PI * 2
+    });
     
-    // КРАСНЫЕ пельмени (опасные, у потолка)
+    // Красный пельмень (верх) - реже
     if (Math.random() < PELMEN.badSpawnChance) {
         pelmeni.push({
-            x: canvas.width + Math.random() * 200,
-            y: Math.random() * (PELMEN.badMaxY - PELMEN.badMinY) + PELMEN.badMinY,
+            x: canvas.width + Math.random() * 100 + 50,
+            y: Math.random() * 70 + 80, // 80-150 (у потолка)
             width: PELMEN.width,
             height: PELMEN.height,
             isGood: false,
             collected: false,
             float: Math.random() * Math.PI * 2,
-            speed: 0.3 + Math.random() * 0.3,
-            warning: true // Мигает как предупреждение
+            blink: 0
         });
     }
 }
@@ -263,7 +198,7 @@ function update() {
     
     frames++;
     
-    // ФИЗИКА КОЗЫ
+    // КЛАССИЧЕСКАЯ ФИЗИКА
     goat.velocity += goat.gravity;
     goat.y += goat.velocity;
     
@@ -272,37 +207,35 @@ function update() {
     if (goat.rotation > 0.5) goat.rotation = 0.5;
     if (goat.rotation < -0.5) goat.rotation = -0.5;
     
-    // ПОТОЛОК (с красными пельменями!)
-    if (goat.y < goat.maxJumpHeight) {
-        goat.y = goat.maxJumpHeight;
+    // Потолок (мягкий)
+    if (goat.y < 20) {
+        goat.y = 20;
         goat.velocity = 0;
-        goat.isAtCeiling = true;
-    } else {
-        goat.isAtCeiling = false;
     }
     
-    // Движение земли
+    // Земля
     ground.x -= ground.speed;
     if (ground.x <= -canvas.width) ground.x = 0;
     
-    // ЛАВОЧКИ
+    // Лавочки
     for (let i = benches.length - 1; i >= 0; i--) {
         const bench = benches[i];
         bench.x -= BENCH.speed;
         
-        // Прохождение
         if (!bench.passed && bench.x + bench.width < goat.x) {
             bench.passed = true;
             score += 5;
             document.getElementById('score').textContent = score;
             
-            if (benches.length < 3) addBench();
+            if (benches.length < 3) {
+                addBench();
+                if (Math.random() < 0.7) addPelmen();
+            }
         }
         
-        // Удаление
         if (bench.x + bench.width < 0) benches.splice(i, 1);
         
-        // КОЛЛИЗИЯ
+        // Столкновение
         if (goat.x + goat.width > bench.x &&
             goat.x < bench.x + bench.width &&
             goat.y + goat.height > bench.y &&
@@ -312,20 +245,17 @@ function update() {
         }
     }
     
-    // ПЕЛЬМЕНИ
+    // Пельмени
     for (let i = pelmeni.length - 1; i >= 0; i--) {
         const pelmen = pelmeni[i];
-        
-        // Движение и анимация
-        pelmen.float += pelmen.speed * 0.05;
         pelmen.x -= BENCH.speed;
+        pelmen.float += 0.05;
         
-        // Мигание для красных пельменей
         if (!pelmen.isGood) {
-            pelmen.warning = Math.sin(frames * 0.1) > 0;
+            pelmen.blink += 0.1;
         }
         
-        // КОЛЛИЗИЯ С ПЕЛЬМЕНЕМ
+        // Коллизия
         if (!pelmen.collected &&
             goat.x + goat.width - 10 > pelmen.x &&
             goat.x + 10 < pelmen.x + pelmen.width &&
@@ -337,39 +267,36 @@ function update() {
             if (pelmen.isGood) {
                 score += PELMEN.goodPoints;
                 pelmen.effect = '+10';
-                pelmen.effectColor = '#FFD700';
+                pelmen.color = '#FFD700';
             } else {
                 score += PELMEN.badPoints;
                 if (score < 0) score = 0;
                 pelmen.effect = '-20';
-                pelmen.effectColor = '#ff4444';
+                pelmen.color = '#ff4444';
             }
             
             document.getElementById('score').textContent = score;
             
-            // Удаляем через время
             setTimeout(() => {
-                const index = pelmeni.indexOf(pelmen);
-                if (index > -1) pelmeni.splice(index, 1);
-            }, 400);
+                const idx = pelmeni.indexOf(pelmen);
+                if (idx > -1) pelmeni.splice(idx, 1);
+            }, 300);
         }
         
-        // Удаление
         if (pelmen.x + pelmen.width < -50) {
             pelmeni.splice(i, 1);
         }
     }
     
-    // ЗЕМЛЯ
+    // Падение на землю
     if (goat.y + goat.height > ground.y) {
-        goat.y = ground.y - goat.height;
         gameOver = true;
         endGame();
     }
     
-    // Автоматическое добавление
+    // Автодобавление
     if (frames % 120 === 0) addBench();
-    if (frames % 90 === 0) addPelmeni();
+    if (frames % 90 === 0 && Math.random() < 0.6) addPelmen();
 }
 
 function endGame() {
@@ -392,103 +319,56 @@ function draw() {
     // Фон
     ctx.drawImage(BG_IMG, 0, 0, canvas.width, canvas.height);
     
-    // КРАСНАЯ ЗОНА ОПАСНОСТИ (у потолка)
-    if (gameStarted && !gameOver) {
-        ctx.fillStyle = 'rgba(255, 50, 50, 0.15)';
-        ctx.fillRect(0, 0, canvas.width, goat.maxJumpHeight + 50);
-        
-        ctx.strokeStyle = 'rgba(255, 50, 50, 0.4)';
-        ctx.lineWidth = 3;
-        ctx.setLineDash([10, 5]);
-        ctx.beginPath();
-        ctx.moveTo(0, goat.maxJumpHeight + 50);
-        ctx.lineTo(canvas.width, goat.maxJumpHeight + 50);
-        ctx.stroke();
-        ctx.setLineDash([]);
-    }
+    // Зона опасности (верх)
+    ctx.fillStyle = 'rgba(255, 50, 50, 0.1)';
+    ctx.fillRect(0, 0, canvas.width, 150);
     
-    // ЛАВОЧКИ
+    // Лавочки
     benches.forEach(bench => {
         ctx.drawImage(PIPE_IMG, bench.x, bench.y, bench.width, bench.height);
     });
     
-    // ПЕЛЬМЕНИ
+    // Пельмени
     pelmeni.forEach(pelmen => {
         if (!pelmen.collected) {
             ctx.save();
             ctx.translate(pelmen.x + pelmen.width/2, pelmen.y + pelmen.height/2);
-            ctx.rotate(pelmen.float * 0.3);
+            ctx.rotate(pelmen.float);
             
             if (pelmen.isGood) {
-                // Золотой пельмень
+                // Золотой
                 ctx.drawImage(PELMEN_IMG, -pelmen.width/2, -pelmen.height/2, pelmen.width, pelmen.height);
             } else {
-                // Красный пельмень (мигает)
-                if (!pelmen.warning) {
-                    ctx.globalAlpha = 0.6;
+                // Красный (мигает)
+                if (Math.sin(pelmen.blink) > 0) {
+                    ctx.globalAlpha = 0.7;
                 }
                 ctx.drawImage(BAD_PELMEN_IMG, -pelmen.width/2, -pelmen.height/2, pelmen.width, pelmen.height);
             }
             
             ctx.restore();
-        } else {
+        } else if (pelmen.effect) {
             // Эффект сбора
-            if (pelmen.effect) {
-                ctx.save();
-                ctx.translate(pelmen.x + pelmen.width/2, pelmen.y - 20);
-                ctx.globalAlpha = 0.8;
-                ctx.fillStyle = pelmen.effectColor;
-                ctx.font = 'bold 22px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(pelmen.effect, 0, 0);
-                ctx.restore();
-            }
+            ctx.save();
+            ctx.globalAlpha = 0.9;
+            ctx.fillStyle = pelmen.color;
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(pelmen.effect, pelmen.x + pelmen.width/2, pelmen.y - 10);
+            ctx.restore();
         }
     });
     
-    // Эффекты двойного тапа
-    if (window.effects) {
-        window.effects = window.effects.filter(effect => {
-            if (effect.life > 0) {
-                ctx.save();
-                ctx.globalAlpha = effect.alpha;
-                ctx.strokeStyle = '#00ffff';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(effect.x, effect.y, effect.radius, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.restore();
-                return true;
-            }
-            return false;
-        });
-    }
-    
-    // ЗЕМЛЯ
+    // Земля
     ctx.drawImage(GROUND_IMG, ground.x, ground.y, canvas.width, ground.height);
     ctx.drawImage(GROUND_IMG, ground.x + canvas.width, ground.y, canvas.width, ground.height);
     
-    // КОЗА
+    // Коза
     ctx.save();
-    ctx.translate(goat.x + goat.width / 2, goat.y + goat.height / 2);
+    ctx.translate(goat.x + goat.width/2, goat.y + goat.height/2);
     ctx.rotate(goat.rotation);
-    
-    // Если у потолка - красный оттенок
-    if (goat.isAtCeiling) {
-        ctx.filter = 'brightness(1.3) saturate(1.5)';
-    }
-    
-    ctx.drawImage(BIRD_IMG, -goat.width / 2, -goat.height / 2, goat.width, goat.height);
+    ctx.drawImage(BIRD_IMG, -goat.width/2, -goat.height/2, goat.width, goat.height);
     ctx.restore();
-    
-    // ПОДСКАЗКА ПРО ДВОЙНОЙ ТАП
-    if (gameStarted && !gameOver && frames % 120 < 60) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        ctx.font = 'bold 16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('👆👆 Двойной тап для рывка вверх!', canvas.width/2, 40);
-    }
 }
 
 // ====================
@@ -500,6 +380,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+// Инициализация
 window.onload = function() {
     // Telegram
     if (window.Telegram && Telegram.WebApp) {
@@ -512,8 +393,10 @@ window.onload = function() {
     gameLoop();
     
     // Загрузка изображений
-    [BIRD_IMG, PIPE_IMG, BG_IMG, GROUND_IMG, PELMEN_IMG, BAD_PELMEN_IMG].forEach(img => {
-        img.onload = () => console.log('Изображение загружено');
+    const images = [BIRD_IMG, PIPE_IMG, BG_IMG, GROUND_IMG, PELMEN_IMG, BAD_PELMEN_IMG];
+    images.forEach(img => {
+        img.onload = () => console.log('Загружено:', img.src);
+        img.onerror = (e) => console.error('Ошибка:', img.src, e);
     });
     
     // Рекорд
