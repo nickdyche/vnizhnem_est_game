@@ -22,8 +22,10 @@
                 
                 <div class="game-buttons">
                     <button id="startBtn">СТАРТ!</button>
-                    <button id="showRecordBtn" class="record-btn">🏆 Мой рекорд: <span id="currentHighScore">0</span></button>
                 </div>
+                
+                <!-- ПРОСТО ТЕКСТ С РЕКОРДОМ -->
+                <p class="record-text">🏆 Мой рекорд: <span id="currentHighScore">0</span></p>
             </div>
             
             <!-- ЭКРАН ПРОИГРЫША -->
@@ -34,7 +36,6 @@
                 
                 <div class="game-buttons">
                     <button id="restartBtn">Играть снова</button>
-                    <button id="showRecordAfterGame" class="record-btn">Посмотреть рекорд</button>
                 </div>
                 
                 <p class="hint">Попробуй побить рекорд!</p>
@@ -55,23 +56,6 @@
             </p>
             <p>Летим по Волге, собираем пельмени! 🥟</p>
         </div>
-    </div>
-
-    <!-- ПОПАП ДЛЯ РЕКОРДА -->
-    <div id="recordOverlay" class="overlay" style="display: none;"></div>
-    <div id="recordPopup" class="record-popup" style="display: none;">
-        <h3>🏆 Мой рекорд</h3>
-        <div class="record-stats">
-            <p>Лучший счет: <span class="record-value" id="popupHighScore">0</span></p>
-            <p>Собрано пельменей: <span class="record-value" id="totalPelmeni">0</span></p>
-            <p>Всего игр: <span class="record-value" id="totalGames">0</span></p>
-        </div>
-        <div class="record-achievements">
-            <p class="achievement" id="achievement1">🥉 100+ очков</p>
-            <p class="achievement" id="achievement2">🥈 250+ очков</p>
-            <p class="achievement" id="achievement3">🥇 500+ очков</p>
-        </div>
-        <button id="closeRecordBtn" class="close-btn">Закрыть</button>
     </div>
 
     <script src="game.js"></script>
