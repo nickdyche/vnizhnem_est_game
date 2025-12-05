@@ -106,12 +106,11 @@ const SHAWARMA_BONUS = {
     effect: "shield",
     duration: 300, // 5 секунд (300 кадров при 60fps)
     color: "#FF6B00", // Оранжевый
-    spawnEvery: 300, // Появляется каждые 300 очков
-    lastSpawnAt: 0
+    lastActivatedAt: 0
 };
 
-// Массив активных бонусов на поле
-const bonuses = [];
+// Массив визуальных эффектов бонусов
+const bonusEffects = [];
 
 // Коза
 const goat = {
@@ -223,23 +222,37 @@ function updateStartArc() {
 // СИСТЕМА БОНУСОВ
 // ====================
 
-function addBonus() {
-    // Проверяем, пора ли спавнить бонус
-    if (score - SHAWARMA_BONUS.lastSpawnAt >= SHAWARMA_BONUS.spawnEvery) {
-        SHAWARMA_BONUS.lastSpawnAt = score;
+function checkAutoBonus() {
+    // Активируем бонус автоматически каждые 200 очков
+    if (score > 0 && score % 200 === 0 && score !== SHAWARMA_BONUS.lastActivatedAt) {
+        SHAWARMA_BONUS.lastActivatedAt = score;
         
-        bonuses.push({
-            x: canvas.width + Math.random() * 100,
-            y: Math.random() * (canvas.height - 200) + 100,
-            width: 50,
-            height: 50,
-            type: 'shawarma',
-            collected: false,
-            float: Math.random() * Math.PI * 2
-        });
+        // Создаем визуальный эффект
+        createBonusEffect();
         
-        console.log('Бонус Шаурма добавлен!');
+        // Активируем бонус
+        activateBonus('shawarma');
+        
+        console.log('Бонус Шаурма активирован автоматически за 200 очков!');
     }
+}
+
+function createBonusEffect() {
+    // Создаем эффект появления бонуса в случайном месте
+    const effectX = Math.random() * (canvas.width - 100) + 50;
+    const effectY = Math.random() * (canvas.height - 200) + 100;
+    
+    bonusEffects.push({
+        x: effectX,
+        y: effectY,
+        width: 80,
+        height: 80,
+        type: 'shawarma_effect',
+        lifetime: 60, // 1 секунда
+        scale: 0.5,
+        alpha: 1.0,
+        rotation: 0
+    });
 }
 
 function updateBonuses() {
@@ -260,28 +273,19 @@ function updateBonuses() {
         }
     }
     
-    // Двигаем бонусы на поле
-    const currentSpeed = getCurrentSpeed();
-    for (let i = bonuses.length - 1; i >= 0; i--) {
-        const bonus = bonuses[i];
-        bonus.x -= currentSpeed;
-        bonus.float += 0.05;
+    // Обновляем визуальные эффекты
+    for (let i = bonusEffects.length - 1; i >= 0; i--) {
+        const effect = bonusEffects[i];
         
-        // Проверяем сбор бонуса
-        if (!bonus.collected &&
-            goat.x + goat.width - 15 > bonus.x &&
-            goat.x + 15 < bonus.x + bonus.width &&
-            goat.y + goat.height - 15 > bonus.y &&
-            goat.y + 15 < bonus.y + bonus.height) {
+        if (effect.type === 'shawarma_effect') {
+            effect.lifetime--;
+            effect.scale += 0.02;
+            effect.alpha -= 0.016;
+            effect.rotation += 0.05;
             
-            bonus.collected = true;
-            activateBonus('shawarma');
-            bonuses.splice(i, 1);
-        }
-        
-        // Удаляем бонусы за экраном
-        if (bonus.x + bonus.width < -50) {
-            bonuses.splice(i, 1);
+            if (effect.lifetime <= 0) {
+                bonusEffects.splice(i, 1);
+            }
         }
     }
 }
@@ -465,8 +469,8 @@ function startGame() {
     bonusTimer = 0;
     bonusPopupTime = 0;
     isBonusPopupActive = false;
-    bonuses.length = 0;
-    SHAWARMA_BONUS.lastSpawnAt = 0;
+    bonusEffects.length = 0;
+    SHAWARMA_BONUS.lastActivatedAt = 0;
     
     benches.length = 0;
     pelmeni.length = 0;
@@ -507,8 +511,8 @@ function resetGame() {
     bonusTimer = 0;
     bonusPopupTime = 0;
     isBonusPopupActive = false;
-    bonuses.length = 0;
-    SHAWARMA_BONUS.lastSpawnAt = 0;
+    bonusEffects.length = 0;
+    SHAWARMA_BONUS.lastActivatedAt = 0;
     
     benches.length = 0;
     pelmeni.length = 0;
@@ -586,15 +590,13 @@ function update() {
         return;
     }
     
+    // Проверяем автоматический бонус
+    checkAutoBonus();
+    
     // Обновляем уровень
     updateLevel();
     
     if (levelUpEffect > 0) levelUpEffect--;
-    
-    // Добавляем бонусы
-    if (frames % 180 === 0) { // Проверяем каждые 3 секунды
-        addBonus();
-    }
     
     // Обновляем бонусы
     updateBonuses();
@@ -768,6 +770,33 @@ function draw() {
     
     ctx.drawImage(BG_IMG, 0, 0, canvas.width, canvas.height);
     
+    // Эффекты бонусов
+    bonusEffects.forEach(effect => {
+        if (effect.type === 'shawarma_effect') {
+            ctx.save();
+            ctx.globalAlpha = effect.alpha;
+            ctx.translate(effect.x, effect.y);
+            ctx.rotate(effect.rotation);
+            ctx.scale(effect.scale, effect.scale);
+            
+            // Эффект шаурмы
+            ctx.font = 'bold 80px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Свечение
+            ctx.shadowColor = '#FF6B00';
+            ctx.shadowBlur = 20;
+            ctx.fillText('🍔', 0, 0);
+            
+            // Основной текст
+            ctx.shadowBlur = 0;
+            ctx.fillText('🍔', 0, 0);
+            
+            ctx.restore();
+        }
+    });
+    
     // Пельмени
     pelmeni.forEach(pelmen => {
         if (!pelmen.collected) {
@@ -787,29 +816,6 @@ function draw() {
                 ctx.fillText(pelmen.effect, pelmen.x + pelmen.width/2, pelmen.y - age);
                 ctx.restore();
             }
-        }
-    });
-    
-    // Бонусы на поле
-    bonuses.forEach(bonus => {
-        if (!bonus.collected) {
-            ctx.save();
-            ctx.translate(bonus.x + bonus.width/2, bonus.y + bonus.height/2);
-            ctx.rotate(bonus.float);
-            
-            // Рисуем эмодзи шаурмы
-            ctx.font = 'bold 40px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🍔', 0, 0);
-            
-            // Оранжевое свечение
-            if (Math.sin(bonus.float * 3) > 0) {
-                ctx.shadowColor = '#FF6B00';
-                ctx.shadowBlur = 15;
-            }
-            
-            ctx.restore();
         }
     });
     
@@ -1055,7 +1061,7 @@ window.addEventListener('load', function() {
         tg.MainButton.show();
     }
     
-    console.log('Game loaded with SHAWARMA DARK SIDE BONUS!');
+    console.log('Game loaded with AUTO SHAWARMA BONUS every 200 points!');
 });
 
 // Export functions for Telegram
