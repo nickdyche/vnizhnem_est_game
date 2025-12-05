@@ -67,6 +67,10 @@ body {
     align-items: center;
     z-index: 200;
     padding: 20px;
+    border: 8px solid #ff9800;
+    border-radius: 25px;
+    margin: 0;
+    overflow-y: auto;
 }
 
 #gameOverScreen {
@@ -76,16 +80,26 @@ body {
 h1, h2 {
     font-family: 'Press Start 2P', cursive;
     color: #FFD700;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-shadow: 3px 3px 0 #000;
     font-size: 28px;
 }
 
 p {
-    margin: 10px 0;
+    margin: 8px 0;
     font-size: 18px;
     line-height: 1.5;
     max-width: 90%;
+}
+
+/* Контейнер для кнопок (общий) */
+.game-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+    width: 100%;
+    align-items: center;
 }
 
 button {
@@ -96,11 +110,12 @@ button {
     font-size: 20px;
     border-radius: 50px;
     cursor: pointer;
-    margin: 10px 0;
     font-family: 'Press Start 2P', cursive;
     transition: all 0.3s;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     border: 3px solid #FFD700;
+    width: 100%;
+    max-width: 300px;
 }
 
 button:hover {
@@ -115,7 +130,7 @@ button:active {
 .hint {
     font-size: 14px;
     color: #90CAF9;
-    margin-top: 20px;
+    margin-top: 15px;
     font-style: italic;
 }
 
@@ -142,7 +157,6 @@ button:active {
     border: 3px solid #9c4dcc !important;
     font-size: 16px !important;
     padding: 12px 30px !important;
-    margin-top: 15px !important;
 }
 
 .record-btn:hover {
@@ -210,32 +224,6 @@ button:active {
     border-radius: 10px;
 }
 
-/* Стили для ссылки на канал */
-.channel-link {
-    color: #FFD700 !important;
-    text-decoration: none !important;
-    transition: all 0.3s !important;
-    padding: 2px 5px !important;
-    border-radius: 5px !important;
-}
-
-.channel-link:hover {
-    color: #ffffff !important;
-    background: rgba(255, 215, 0, 0.2) !important;
-    text-decoration: underline !important;
-}
-
-.channel-link:active {
-    transform: scale(0.95) !important;
-}
-
-/* Для мобильных */
-@media (max-width: 600px) {
-    .channel-link {
-        display: inline-block !important;
-        margin: 0 3px !important;
-    }
-}
 .achievement {
     margin: 10px 0;
     padding: 10px;
@@ -266,46 +254,168 @@ button:active {
     background: linear-gradient(45deg, #f44336, #d32f2f) !important;
 }
 
-/* Адаптация для мобильных */
+/* Стили для ссылки на канал */
+.channel-link {
+    color: #FFD700 !important;
+    text-decoration: none !important;
+    transition: all 0.3s !important;
+    padding: 2px 5px !important;
+    border-radius: 5px !important;
+}
+
+.channel-link:hover {
+    color: #ffffff !important;
+    background: rgba(255, 215, 0, 0.2) !important;
+    text-decoration: underline !important;
+}
+
+.channel-link:active {
+    transform: scale(0.95) !important;
+}
+
+/* ========================================== */
+/* АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (ВСЁ ИСПРАВЛЕНО!) */
+/* ========================================== */
 @media (max-width: 600px) {
     h1, h2 {
-        font-size: 20px;
+        font-size: 18px !important;
+        margin-bottom: 10px !important;
+        text-align: center !important;
     }
     
     p {
-        font-size: 16px;
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        margin: 6px 0 !important;
+        max-width: 95% !important;
+        text-align: center !important;
     }
     
     button {
-        padding: 12px 30px;
-        font-size: 16px;
+        padding: 10px 20px !important;
+        font-size: 14px !important;
+        margin: 0 !important;
+        max-width: 250px !important;
     }
     
     .record-btn {
-        font-size: 14px !important;
-        padding: 10px 20px !important;
+        font-size: 12px !important;
+        padding: 8px 16px !important;
     }
     
     #score {
-        font-size: 30px;
-        top: 10px;
-        left: 10px;
+        font-size: 24px !important;
+        top: 10px !important;
+        left: 10px !important;
+    }
+    
+    #startScreen, #gameOverScreen {
+        padding: 15px !important;
+        padding-top: 40px !important;
+        justify-content: flex-start !important;
+        overflow-y: auto !important;
+        border-width: 5px !important;
+        border-radius: 20px !important;
+    }
+    
+    #startScreen h1 {
+        margin-top: 10px !important;
+    }
+    
+    .game-buttons {
+        gap: 10px !important;
+        margin: 15px 0 !important;
     }
     
     .record-popup {
-        min-width: 280px;
-        padding: 20px;
+        min-width: 280px !important;
+        padding: 15px !important;
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        margin: 20px !important;
     }
     
     .record-popup h3 {
-        font-size: 18px;
+        font-size: 16px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .record-stats {
+        padding: 10px !important;
+        margin: 15px 0 !important;
     }
     
     .record-stats p {
-        font-size: 16px;
+        font-size: 14px !important;
+        margin: 8px 0 !important;
     }
     
     .record-value {
-        font-size: 20px;
+        font-size: 18px !important;
+    }
+    
+    .achievement {
+        font-size: 14px !important;
+        padding: 8px !important;
+        margin: 6px 0 !important;
+    }
+    
+    .channel-link {
+        display: inline-block !important;
+        margin: 0 2px !important;
+        padding: 1px 3px !important;
+    }
+    
+    .footer {
+        padding: 10px !important;
+        margin-top: 10px !important;
+    }
+    
+    .footer p {
+        font-size: 12px !important;
+    }
+    
+    /* Уменьшаем высоту игры для мобильных */
+    #canvas {
+        height: 500px !important;
+    }
+    
+    #game {
+        max-height: 90vh !important;
+    }
+    
+    .container {
+        padding: 5px !important;
+    }
+    
+    body {
+        padding: 5px !important;
+        align-items: flex-start !important;
+        padding-top: 10px !important;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 400px) {
+    h1, h2 {
+        font-size: 16px !important;
+    }
+    
+    p {
+        font-size: 13px !important;
+    }
+    
+    button {
+        padding: 8px 16px !important;
+        font-size: 12px !important;
+        max-width: 220px !important;
+    }
+    
+    #canvas {
+        height: 450px !important;
+    }
+    
+    #startScreen, #gameOverScreen {
+        padding-top: 30px !important;
     }
 }

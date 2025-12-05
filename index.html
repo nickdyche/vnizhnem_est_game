@@ -12,36 +12,52 @@
     <div class="container">
         <div id="game">
             <div id="score">0</div>
+            
+            <!-- СТАРТОВЫЙ ЭКРАН -->
             <div id="startScreen">
                 <h1>Коза в Нижнем!</h1>
                 <p>Помоги козе бежать по набережной<br>и перепрыгивать лавочки!</p>
                 <p>Собирай пельмени для бонусов! 🥟</p>
                 <p>Нажми ПРОБЕЛ, коснись экрана<br>или нажми кнопку ниже</p>
-                <button id="startBtn">СТАРТ!</button>
-                <button id="showRecordBtn" class="record-btn">🏆 Мой рекорд: <span id="currentHighScore">0</span></button>
+                
+                <div class="game-buttons">
+                    <button id="startBtn">СТАРТ!</button>
+                    <button id="showRecordBtn" class="record-btn">🏆 Мой рекорд: <span id="currentHighScore">0</span></button>
+                </div>
             </div>
+            
+            <!-- ЭКРАН ПРОИГРЫША -->
             <div id="gameOverScreen" style="display: none;">
                 <h2>Коза споткнулась!</h2>
                 <p>Очки: <span id="finalScore">0</span></p>
                 <p>Рекорд: <span id="highScore">0</span></p>
-                <button id="restartBtn">Играть снова</button>
-                <button id="showRecordAfterGame" class="record-btn">Посмотреть рекорд</button>
+                
+                <div class="game-buttons">
+                    <button id="restartBtn">Играть снова</button>
+                    <button id="showRecordAfterGame" class="record-btn">Посмотреть рекорд</button>
+                </div>
+                
                 <p class="hint">Попробуй побить рекорд!</p>
             </div>
+            
+            <!-- ХОЛСТ ДЛЯ ИГРЫ -->
             <canvas id="canvas" width="800" height="600"></canvas>
         </div>
+        
+        <!-- ФУТЕР -->
         <div class="footer">
-    <p>🐐 Игра создана командой 
-        <strong>
-            <a href="https://t.me/vnizhnem_est" target="_blank" class="channel-link">
-                вНижнемЕсть
-            </a>
-        </strong>
-    </p>
-    <p>Летим по Волге, собираем пельмени! 🥟</p>
-</div>
+            <p>🐐 Игра создана командой 
+                <strong>
+                    <a href="https://t.me/vnizhnem_est" target="_blank" class="channel-link">
+                        вНижнемЕсть
+                    </a>
+                </strong>
+            </p>
+            <p>Летим по Волге, собираем пельмени! 🥟</p>
+        </div>
+    </div>
 
-    <!-- Оверлей и попап для рекорда -->
+    <!-- ПОПАП ДЛЯ РЕКОРДА -->
     <div id="recordOverlay" class="overlay" style="display: none;"></div>
     <div id="recordPopup" class="record-popup" style="display: none;">
         <h3>🏆 Мой рекорд</h3>
