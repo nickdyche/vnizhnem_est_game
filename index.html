@@ -9,21 +9,13 @@
 </head>
 <body>
     <div class="container">
-        <!-- ОТДЕЛЬНАЯ ССЫЛКА НА ТЕЛЕГРАМ -->
-        <div class="telegram-fixed-link">
-            <a href="https://t.me/vnizhnem_est" target="_blank" class="telegram-button">
-                <span class="tg-icon">📢</span>
-                <span class="tg-text">Подписаться на <strong>вНижнемЕсть</strong></span>
-            </a>
-        </div>
-        
         <div id="game">
             <div id="score">0</div>
             
             <!-- СТАРТОВЫЙ ЭКРАН -->
             <div id="startScreen">
                 <h1>🐐 Коза в Нижнем</h1>
-                <p class="subtitle">Лети над Волгой, собирай бонусы, избегай опасность!</p>
+                <p class="subtitle">Лети над Волгой, собирай пельмени, избегай птиц!</p>
                 
                 <div class="simple-instructions">
                     <p>Тапни или нажми ПРОБЕЛ чтобы лететь</p>
@@ -58,9 +50,17 @@
             
             <!-- ХОЛСТ -->
             <canvas id="canvas" width="800" height="600"></canvas>
+            
+            <!-- ТЕЛЕГРАМ КНОПКА ВНИЗУ ВНУТРИ ИГРЫ -->
+            <div class="telegram-bottom-link">
+                <a href="https://t.me/vnizhnem_est" target="_blank" class="telegram-button">
+                    <span class="tg-icon">📢</span>
+                    <span class="tg-text">Подписаться на <strong>вНижнемЕсть</strong></span>
+                </a>
+            </div>
         </div>
         
-        <!-- ФУТЕР -->
+        <!-- ФУТЕР (просто информационный) -->
         <div class="footer">
             <p>Игра создана для проекта 
                 <a href="https://t.me/vnizhnem_est" target="_blank" class="footer-link">
@@ -71,9 +71,8 @@
         </div>
     </div>
 
-    <!-- Скрипт В НАЧАЛЕ body чтобы кнопки работали -->
+    <!-- Скрипт для рекорда -->
     <script>
-        // Сначала устанавливаем рекорд из localStorage
         document.addEventListener('DOMContentLoaded', function() {
             const highScore = parseInt(localStorage.getItem('goatHighScore')) || 0;
             document.getElementById('currentHighScore').textContent = highScore;
