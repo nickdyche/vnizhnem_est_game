@@ -132,6 +132,10 @@ button:active {
     font-size: 14px;
 }
 
+.footer strong {
+    color: #FFD700;
+}
+
 /* Адаптация для мобильных */
 @media (max-width: 600px) {
     h1, h2 {
