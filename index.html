@@ -9,10 +9,13 @@
 </head>
 <body>
     <div class="container">
-        <!-- ССЫЛКА НА ТЕЛЕГРАМ -->
-        <a href="https://t.me/vnizhnem_est" target="_blank" class="telegram-link">
-            📢 <strong>вНижнемЕсть</strong> в Telegram
-        </a>
+        <!-- ОТДЕЛЬНАЯ ССЫЛКА НА ТЕЛЕГРАМ (кликабельная всегда!) -->
+        <div class="telegram-fixed-link">
+            <a href="https://t.me/vnizhnem_est" target="_blank" class="telegram-button">
+                <span class="tg-icon">📢</span>
+                <span class="tg-text">Подписаться на <strong>вНижнемЕсть</strong></span>
+            </a>
+        </div>
         
         <div id="game">
             <div id="score">0</div>
@@ -20,7 +23,7 @@
             <!-- СТАРТОВЫЙ ЭКРАН -->
             <div id="startScreen">
                 <h1>🐐 Коза в Нижнем</h1>
-                <p class="subtitle">Лети над Волгой, собирай бонусы, избегай опасность!</p>
+                <p class="subtitle">Лети над Волгой, собирай пельмени, избегай птиц!</p>
                 
                 <div class="simple-instructions">
                     <p>Тапни или нажми ПРОБЕЛ чтобы лететь</p>
@@ -50,7 +53,7 @@
                 
                 <button id="restartBtn">ИГРАТЬ СНОВА</button>
                 
-                <p class="game-tip">Лети выше птиц, ниже лавочек! Или наоборот. </p>
+                <p class="game-tip">Лети выше птиц, ниже лавочек!</p>
             </div>
             
             <!-- ХОЛСТ -->

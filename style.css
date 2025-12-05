@@ -16,6 +16,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 15px;
+    position: relative;
 }
 
 .container {
@@ -25,37 +26,62 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    position: relative;
 }
 
-/* ССЫЛКА НА ТЕЛЕГРАМ - КРУПНАЯ */
-.telegram-link {
-    display: block;
+/* ========================================== */
+/* ССЫЛКА НА ТЕЛЕГРАМ - ОТДЕЛЬНАЯ, ПОВЕРХ ВСЕГО */
+/* ========================================== */
+.telegram-fixed-link {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+    pointer-events: auto;
+}
+
+.telegram-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
     background: linear-gradient(145deg, #0088cc, #00aaff);
     color: white !important;
     text-decoration: none !important;
-    padding: 18px 35px;
+    padding: 14px 25px;
     border-radius: 60px;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: bold;
     border: 4px solid #00ccff;
-    text-align: center;
     transition: all 0.2s;
     box-shadow: 0 8px 25px rgba(0, 136, 204, 0.5);
-    width: 100%;
-    max-width: 500px;
+    white-space: nowrap;
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1001;
 }
 
-.telegram-link:hover {
-    transform: scale(1.03);
+.telegram-button:hover {
+    transform: scale(1.05);
     background: linear-gradient(145deg, #00aaff, #0088cc);
     box-shadow: 0 10px 30px rgba(0, 136, 204, 0.7);
 }
 
-.telegram-link strong {
+.tg-icon {
+    font-size: 24px;
+}
+
+.tg-text {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.telegram-button strong {
     color: #ffff00 !important;
 }
 
-/* ИГРА - БОЛЬШАЯ */
+/* ИГРА */
 #game {
     position: relative;
     width: 100%;
@@ -67,6 +93,7 @@ body {
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
     border: 8px solid #ff8c00;
     background: #1e3a8a;
+    margin-top: 70px;
 }
 
 #canvas {
@@ -74,9 +101,10 @@ body {
     width: 100%;
     height: 100%;
     background: transparent;
+    transform-origin: center center;
 }
 
-/* СЧЕТ - ОГРОМНЫЙ */
+/* СЧЕТ */
 #score {
     position: absolute;
     top: 25px;
@@ -114,7 +142,7 @@ body {
     background: linear-gradient(135deg, rgba(139, 0, 0, 0.95), rgba(185, 28, 28, 0.95));
 }
 
-/* ЗАГОЛОВКИ - КРУПНЫЕ */
+/* ЗАГОЛОВКИ */
 h1, h2 {
     font-family: 'Press Start 2P', cursive;
     color: #FFD700;
@@ -137,7 +165,7 @@ h2 {
     max-width: 90% !important;
 }
 
-/* ИНСТРУКЦИИ ПРОСТЫЕ */
+/* ИНСТРУКЦИИ */
 .simple-instructions {
     background: rgba(255, 255, 255, 0.1);
     padding: 25px;
@@ -155,7 +183,7 @@ h2 {
     margin: 0 !important;
 }
 
-/* КНОПКИ - ОЧЕНЬ БОЛЬШИЕ */
+/* КНОПКИ */
 button {
     background: linear-gradient(145deg, #FF6B00, #FF8C00);
     color: white;
@@ -280,38 +308,66 @@ button:hover, button:active {
 }
 
 /* ========================================== */
-/* МОБИЛЬНАЯ ВЕРСИЯ - ВСЁ ЕЩЕ КРУПНЕЕ! */
+/* МОБИЛЬНАЯ ВЕРСИЯ - УВЕЛИЧЕННЫЙ МАСШТАБ! */
 /* ========================================== */
 @media (max-width: 768px) {
     body {
         padding: 10px;
         justify-content: flex-start;
-        padding-top: 20px;
+        padding-top: 80px;
+        transform: scale(1); /* Базовый масштаб */
     }
     
     .container {
         gap: 15px;
         width: 100%;
+        transform: scale(1.15); /* УВЕЛИЧИВАЕМ ВСЕ НА 15%! */
+        transform-origin: top center;
+        margin-top: -20px;
     }
     
-    /* ИГРА ЗАНИМАЕТ БОЛЬШЕ МЕСТА */
+    /* ССЫЛКА НА ТЕЛЕГРАМ НА МОБИЛЬНЫХ */
+    .telegram-fixed-link {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        text-align: center;
+        z-index: 1000;
+        transform: scale(0.9); /* Чуть уменьшаем ссылку */
+    }
+    
+    .telegram-button {
+        padding: 12px 20px;
+        font-size: 16px;
+        border-width: 3px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tg-icon {
+        font-size: 20px;
+    }
+    
+    /* ИГРА - УВЕЛИЧИВАЕМ МАСШТАБ */
     #game {
-        height: 70vh;
-        min-height: 450px;
+        height: 60vh; /* Чуть меньше высоты */
+        min-height: 420px;
         border-width: 6px;
         border-radius: 25px;
         width: 100%;
+        margin-top: 0;
+        transform: scale(1.2); /* ДОПОЛНИТЕЛЬНОЕ УВЕЛИЧЕНИЕ ИГРЫ! */
+        transform-origin: center center;
     }
     
-    /* ССЫЛКА ЕЩЕ КРУПНЕЕ */
-    .telegram-link {
-        padding: 16px 25px;
-        font-size: 20px;
-        border-width: 3px;
-        max-width: 95%;
+    /* КАНВАС - УВЕЛИЧИВАЕМ ВНУТРИ ИГРЫ */
+    #canvas {
+        transform: scale(1.1); /* ЕЩЕ УВЕЛИЧЕНИЕ! */
+        transform-origin: center center;
     }
     
-    /* ЗАГОЛОВКИ КРУПНЕЕ */
+    /* ЗАГОЛОВКИ ЕЩЕ КРУПНЕЕ */
     h1 {
         font-size: 32px !important;
         margin-bottom: 20px !important;
@@ -323,97 +379,109 @@ button:hover, button:active {
     }
     
     .subtitle {
-        font-size: 20px !important;
+        font-size: 22px !important;
         margin-bottom: 30px !important;
     }
     
     /* СЧЕТ ОГРОМНЫЙ */
     #score {
-        font-size: 42px !important;
-        top: 15px !important;
-        left: 15px !important;
-        padding: 10px 20px !important;
-        border-width: 3px !important;
+        font-size: 46px !important;
+        top: 20px !important;
+        left: 20px !important;
+        padding: 10px 22px !important;
+        border-width: 4px !important;
+        transform: scale(1.1); /* УВЕЛИЧИВАЕМ СЧЕТ ТОЖЕ */
     }
     
     /* ЭКРАНЫ */
     #startScreen, #gameOverScreen {
-        padding: 30px 20px !important;
+        padding: 35px 25px !important;
         justify-content: center !important;
     }
     
     /* ИНСТРУКЦИИ */
     .simple-instructions {
-        padding: 20px !important;
-        margin: 25px 0 !important;
-        width: 95% !important;
-    }
-    
-    .simple-instructions p {
-        font-size: 20px !important;
-    }
-    
-    /* КНОПКИ ОГРОМНЫЕ */
-    button {
-        padding: 22px 45px !important;
-        font-size: 28px !important;
-        min-width: 300px !important;
-        min-height: 80px !important;
-        border-width: 5px !important;
-        margin: 25px 0 !important;
-    }
-    
-    /* РЕКОРДЫ */
-    .high-score {
-        padding: 18px 25px !important;
-        margin-top: 25px !important;
-    }
-    
-    .high-score p {
-        font-size: 20px !important;
-    }
-    
-    .high-score span {
-        font-size: 24px !important;
-    }
-    
-    /* ФИНАЛЬНЫЙ СЧЕТ */
-    .final-scores {
-        padding: 25px !important;
+        padding: 22px !important;
         margin: 30px 0 !important;
         width: 95% !important;
     }
     
+    .simple-instructions p {
+        font-size: 24px !important; /* КРУПНЕЕ! */
+    }
+    
+    /* КНОПКИ ЕЩЕ БОЛЬШЕ */
+    button {
+        padding: 25px 45px !important;
+        font-size: 30px !important;
+        min-width: 320px !important;
+        min-height: 90px !important;
+        border-width: 5px !important;
+        margin: 30px 0 !important;
+        transform: scale(1.05); /* Чуть увеличиваем кнопки */
+    }
+    
+    /* РЕКОРДЫ */
+    .high-score {
+        padding: 22px 30px !important;
+        margin-top: 30px !important;
+    }
+    
+    .high-score p {
+        font-size: 26px !important; /* КРУПНЕЕ! */
+    }
+    
+    .high-score span {
+        font-size: 30px !important;
+    }
+    
+    /* ФИНАЛЬНЫЙ СЧЕТ */
+    .final-scores {
+        padding: 30px !important;
+        margin: 35px 0 !important;
+        width: 95% !important;
+    }
+    
     .score-row {
-        margin: 15px 0 !important;
-        padding: 15px 20px !important;
-        font-size: 20px !important;
+        margin: 20px 0 !important;
+        padding: 20px 25px !important;
+        font-size: 26px !important; /* КРУПНЕЕ! */
     }
     
     .score-value {
-        font-size: 26px !important;
+        font-size: 34px !important; /* КРУПНЕЕ! */
     }
     
     /* СОВЕТ */
     .game-tip {
-        font-size: 18px !important;
-        margin-top: 25px !important;
-        padding: 12px 20px !important;
+        font-size: 22px !important;
+        margin-top: 30px !important;
+        padding: 15px 22px !important;
     }
     
     /* ФУТЕР */
     .footer {
-        padding: 18px !important;
-        margin-top: 20px !important;
+        padding: 20px !important;
+        margin-top: 25px !important;
+        transform: scale(0.95); /* Чуть уменьшаем футер */
     }
     
     .footer p {
-        font-size: 16px !important;
+        font-size: 18px !important;
     }
 }
 
-/* ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ */
+/* ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ (iPhone SE) */
 @media (max-width: 375px) {
+    .container {
+        transform: scale(1.1); /* Чуть меньше увеличение */
+    }
+    
+    .telegram-button {
+        font-size: 15px;
+        padding: 11px 18px;
+    }
+    
     h1 {
         font-size: 28px !important;
     }
@@ -423,35 +491,50 @@ button:hover, button:active {
     }
     
     .subtitle {
-        font-size: 18px !important;
+        font-size: 20px !important;
     }
     
     button {
-        padding: 20px 35px !important;
-        font-size: 24px !important;
+        padding: 22px 35px !important;
+        font-size: 26px !important;
         min-width: 280px !important;
-        min-height: 75px !important;
+        min-height: 85px !important;
     }
     
     #score {
-        font-size: 36px !important;
-    }
-    
-    .simple-instructions p {
-        font-size: 18px !important;
+        font-size: 40px !important;
     }
     
     #game {
-        height: 65vh;
-        min-height: 400px;
+        height: 55vh;
+        min-height: 380px;
+        transform: scale(1.15);
     }
 }
 
 /* ГОРИЗОНТАЛЬНАЯ ОРИЕНТАЦИЯ */
 @media (max-height: 500px) and (orientation: landscape) {
+    .telegram-fixed-link {
+        top: 5px;
+        right: 5px;
+        left: auto;
+        width: auto;
+    }
+    
+    .telegram-button {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+    
     #game {
-        height: 85vh;
+        height: 80vh;
         max-height: none;
+        margin-top: 50px;
+        transform: scale(1.1);
+    }
+    
+    .container {
+        transform: scale(1);
     }
     
     h1 {
@@ -460,24 +543,29 @@ button:hover, button:active {
     }
     
     .subtitle {
-        font-size: 16px !important;
+        font-size: 18px !important;
         margin-bottom: 20px !important;
     }
     
     button {
-        padding: 15px 30px !important;
-        font-size: 20px !important;
-        min-height: 65px !important;
+        padding: 18px 30px !important;
+        font-size: 22px !important;
+        min-height: 70px !important;
         margin: 20px 0 !important;
     }
     
     #score {
-        font-size: 32px !important;
+        font-size: 34px !important;
     }
 }
 
 /* БОЛЬШИЕ ЭКРАНЫ */
 @media (min-width: 1200px) {
+    .telegram-button {
+        font-size: 20px;
+        padding: 16px 30px;
+    }
+    
     #game {
         max-width: 1000px;
         max-height: 750px;
